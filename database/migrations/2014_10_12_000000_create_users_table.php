@@ -13,9 +13,15 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+<<<<<<< HEAD
             $table->string('uid',50)->unique();
             $table->string('nama',100);
             $table->integer('saldo');
+=======
+            $table->string('uid', 50)->unique();
+            $table->string('nama', 100);
+            $table->integer('saldo', );
+>>>>>>> 92dede23f7465d5cdf94469304be9379de1ab580
             $table->timestamps();
         });
     }
