@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Transaksi;
+use Illuminate\Support\Facades\Cache;
 
 class TransaksiController extends Controller
 {
@@ -14,7 +15,7 @@ class TransaksiController extends Controller
         $tarif = $request->input('tarif');
 
         // Simpan UID ke cache
-        \Cache::put('latestUID', $uid, 60); // Simpan UID selama 60 detik
+        Cache::put('latestUID', $uid, 60); // Simpan UID selama 60 detik
 
         // Cari user berdasarkan UID
         $user = User::where('uid', $uid)->first();
