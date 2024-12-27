@@ -62,7 +62,7 @@
 
 <body>
     <div class="container mt-5">
-        <h1><i class="fas fa-id-card"></i> RFID Saldo Management</h1>
+        <h1><i class="fas fa-id-card"></i> RFID E - TOL</h1>
         <div id="alert" class="alert d-none" role="alert"></div>
 
         <div id="user-info" class="mt-4 p-3 shadow-sm rounded">
