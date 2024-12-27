@@ -46,26 +46,26 @@ class TransaksiController extends Controller
             'transaksi' => $transaksi,
         ]);
     }
-
     public function getUserByUID(Request $request)
-    {
-        $uid = $request->input('uid'); // UID yang dikirimkan oleh Arduino
+{
+    $uid = $request->input('uid'); // UID yang dikirimkan oleh Arduino
 
-        $user = User::where('uid', $uid)->first();
+    $user = User::where('uid', $uid)->first();
 
-        if (!$user) {
-            return response()->json(['status' => 'gagal', 'message' => 'Pengguna tidak ditemukan'], 404);
-        }
-
-        return response()->json([
-            'status' => 'berhasil',
-            'user' => [
-                'uid' => $user->uid,
-                'nama' => $user->nama,
-                'saldo' => $user->saldo,
-            ],
-        ]);
+    if (!$user) {
+        return response()->json(['status' => 'gagal', 'message' => 'Pengguna tidak ditemukan'], 404);
     }
+
+    return response()->json([
+        'status' => 'berhasil',
+        'user' => [
+            'uid' => $user->uid,
+            'nama' => $user->nama,
+            'saldo' => $user->saldo,
+            'foto' => $user->foto, // Pastikan data foto disertakan
+        ],
+    ]);
+}
 
     public function kurangiSaldo(Request $request)
     {

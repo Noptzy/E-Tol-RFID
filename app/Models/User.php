@@ -10,6 +10,6 @@ class User extends Model
     use HasFactory;
 
     protected $table = 'users';
-    protected $fillable = ['uid', 'nama', 'saldo'];
+    protected $fillable = ['uid', 'nama', 'saldo','foto'];
 
 }

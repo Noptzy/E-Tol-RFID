@@ -1,3 +1,4 @@
+<!-- filepath: /c:/xampp/htdocs/rfidtol/resources/views/dashboard.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,6 +21,7 @@
             <p><strong>Saldo:</strong> <span id="saldo">-</span></p>
             <p><strong>Saldo Sebelumnya:</strong> <span id="saldo-sebelumnya">-</span></p>
             <p><strong>Saldo Sesudah:</strong> <span id="saldo-sesudah">-</span></p>
+            <p><strong>Foto:</strong> <img id="foto" src="" alt="Foto Pengguna" style="max-width: 150px; display: none;"></p>
         </div>
 
         <form id="kurangi-saldo-form" class="mt-3">
@@ -28,6 +30,7 @@
                 <input type="text" class="form-control" id="tarif" placeholder="Masukkan jumlah pengurangan">
             </div>
             <button type="submit" class="btn btn-primary">Kurangi Saldo</button>
+            <a href="/users" class="btn btn-danger">Halaman User</a>
         </form>
     </div>
     <script>
@@ -63,6 +66,8 @@
                     document.getElementById("saldo").textContent = "-";
                     document.getElementById("saldo-sebelumnya").textContent = "-";
                     document.getElementById("saldo-sesudah").textContent = "-";
+                    document.getElementById("foto").style.display = "none";
+                    document.getElementById("foto").src = "";
 
                     // Dapatkan informasi user berdasarkan UID
                     const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, { uid });
@@ -70,6 +75,10 @@
                         const user = userResponse.data.user;
                         document.getElementById("nama").textContent = user.nama;
                         document.getElementById("saldo").textContent = formatNumber(user.saldo);
+                        if (user.foto) {
+                            document.getElementById("foto").src = `/storage/fotos/${user.foto}`;
+                            document.getElementById("foto").style.display = "block";
+                        }
                     } else {
                         showAlert("danger", "User tidak ditemukan!");
                     }
@@ -118,7 +127,7 @@
                         // Tunggu 3 detik sebelum gerbang ditutup dan halaman di-refresh
                         setTimeout(() => {
                             location.reload();
-                        }, 30000    );
+                        }, 30000);
                     }
                 }
             } catch (error) {
