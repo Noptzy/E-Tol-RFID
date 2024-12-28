@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
         ]);
         User::create([
             'uid'=> '1234567',
-            'nama'=> 'Mas Atmin',
+            'nama'=> 'Mas Kyungsoo',
             'saldo' => 898989899
         ]);
     }

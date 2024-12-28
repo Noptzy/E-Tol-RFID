@@ -7,55 +7,127 @@
     <title>RFID Saldo Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #e3f2fd; /* Biru muda */
+            background: linear-gradient(120deg, #657bf6, #fd85fd);
+            font-family: 'Poppins', sans-serif;
         }
 
         .container {
-            background-color: #ffffff; /* Putih */
+            background-color: #ffffff;
             padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            margin: auto;
         }
 
         h1 {
-            color: #0d47a1; /* Biru gelap */
+            color: #000000;
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        #user-info p {
-            font-size: 1.1em;
-            color: #0d47a1; /* Biru */
-        }
-
-        .form-control {
-            font-size: 1.2em;
-        }
-
-        button {
-            font-size: 1.1em;
-        }
-
-        #alert {
-            font-size: 1em;
+        #user-info {
+            background-color: #f9f9f9;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .photo-box {
             width: 150px;
             height: 150px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
+            background-color: #ffffff;
+            border: 1px solid #0d47a1;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .photo-box:hover {
+            transform: scale(1.05);
         }
 
         .photo-box img {
-            max-width: 100%;
-            max-height: 100%;
+            width: 100%;
+            height: 100%;
             border-radius: 8px;
+        }
+
+        p {
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        p strong {
+            color: #000000;
+        }
+
+        .form-control {
+            font-size: 1.2em;
+            border-radius: 10px;
+            box-shadow: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #0d47a1;
+            box-shadow: 0 0 0 0.25rem rgba(13, 71, 161, 0.25);
+        }
+
+        button {
+            font-size: 1.1em;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            background-color: #0d47a1;
+            color: #fff;
+            border: none;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #104a70;
+        }
+
+        #alert {
+            font-size: 1em;
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: #0d47a1;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 1.5rem;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .photo-box {
+                width: 120px;
+                height: 120px;
+            }
         }
     </style>
 </head>
@@ -69,7 +141,7 @@
             <div class="photo-box">
                 <img id="foto" src="" alt="Foto User" onerror="this.src='https://via.placeholder.com/150';">
             </div>
-                        
+
             <p><strong><i class="fas fa-fingerprint"></i> UID:</strong> <span id="uid">-</span></p>
             <p><strong><i class="fas fa-user"></i> Nama:</strong> <span id="nama">-</span></p>
             <p><strong><i class="fas fa-wallet"></i> Saldo:</strong> <span id="saldo">-</span></p>
@@ -86,6 +158,7 @@
         </form>
         <a href="/users">user</a>
     </div>
+
 
     <!-- Include Axios CDN -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
