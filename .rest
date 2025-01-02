@@ -2,6 +2,5 @@ POST http://192.168.100.26:8000/api/proses-transaksi
 
 
 {
-    "uid": "1234567",
-    "tarif": 100000
+    "uid": "123456",
 }

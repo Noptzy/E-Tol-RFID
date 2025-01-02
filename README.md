@@ -69,5 +69,10 @@ Berikut adalah pinout yang digunakan untuk menghubungkan modul RFID dengan NodeM
 | MISO PIN     | D6              |
 | MOSI PIN     | D7              |
 | SCK PIN      | D5              |
-| SDA PIN      | D4              |
+| SDA PIN      | D3              |
 
+| **Pin Servo**| **Pin NodeMCU** |
+|--------------|-----------------|
+| Red Pin      | 3.3V PIN        |
+| Orange PIN   | D4              |
+| Brown PIN    | GND PIN         |
