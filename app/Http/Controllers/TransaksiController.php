@@ -24,11 +24,10 @@ class TransaksiController extends Controller
             ]);
         }
 
-        // Check if there's a completed transaction
         $transactionStatus = \Cache::get('transaction_status_' . $uid);
 
         if ($transactionStatus === 'completed') {
-            \Cache::forget('transaction_status_' . $uid); // Clear the status
+            \Cache::forget('transaction_status_' . $uid); 
             return response()->json([
                 'status' => 'success',
                 'gate_status' => 'open',
@@ -49,7 +48,7 @@ class TransaksiController extends Controller
     }
     public function getUserByUID(Request $request)
     {
-        $uid = $request->input('uid'); // UID yang dikirimkan oleh Arduino
+        $uid = $request->input('uid');
 
         $user = User::where('uid', $uid)->first();
 
@@ -63,7 +62,7 @@ class TransaksiController extends Controller
                 'uid' => $user->uid,
                 'nama' => $user->nama,
                 'saldo' => $user->saldo,
-                'foto' => $user->foto, // Pastikan data foto disertakan
+                'foto' => $user->foto, 
             ],
         ]);
     }
@@ -83,11 +82,9 @@ class TransaksiController extends Controller
             ]);
         }
 
-        // Kurangi saldo
         $user->saldo -= $tarif;
         $user->save();
 
-        // Buat transaksi
         Transaksi::create([
             'uid' => $uid,
             'tarif' => $tarif,
@@ -101,7 +98,7 @@ class TransaksiController extends Controller
             'status' => 'success',
             'gate_status' => 'open',
             'message' => 'Saldo berhasil dikurangi',
-            'saldo_akhir' => $user->saldo // Add this line
+            'saldo_akhir' => $user->saldo 
         ]);
     }
 }

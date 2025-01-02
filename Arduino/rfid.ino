@@ -9,9 +9,9 @@
 #define SS_PIN D3
 #define SERVO_PIN D4
 
-const char* ssid = "wongirengjambuaten136";
-const char* password = "ngawurcik";
-const char* serverName = "http://192.168.100.26:8000/api/proses-transaksi";
+const char* ssid = "your wifi name";
+const char* password = "your wifi password";
+const char* serverName = "http://your-ip:port /api/proses-transaksi";
 
 enum GateState {
   GATE_CLOSED,
@@ -93,7 +93,7 @@ void loop() {
     uid += String(rfid.uid.uidByte[i], HEX);
   }
   uid.toUpperCase();
-  Serial.println("\nCard detected - UID: " + uid);
+  Serial.println("\nKartu Terdeteksi - UID: " + uid);
 
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
@@ -129,12 +129,12 @@ void loop() {
           } 
           else if (strcmp(gateStatus, "waiting") == 0) {
             currentState = GATE_WAITING;
-            Serial.println("Waiting for balance check...");
+            Serial.println("Menunggu Konfirmasi Transaksi...");
             checkTransactionStatus(uid);
           }
         } else {
           currentState = GATE_CLOSED;
-          Serial.println("Access denied - Gate remains closed");
+          Serial.println("Akses Ditolak, Kartu Tidak Terdaftar");
         }
       }
     }

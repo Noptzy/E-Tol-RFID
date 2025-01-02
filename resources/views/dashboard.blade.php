@@ -36,7 +36,6 @@
     <script>
         const apiUrl = "http://192.168.100.26:8000/api";
 
-        // Fungsi untuk menampilkan notifikasi
         function showAlert(type, message) {
             const alert = document.getElementById("alert");
             alert.className = `alert alert-${type}`;
@@ -44,24 +43,19 @@
             alert.classList.remove("d-none");
             setTimeout(() => alert.classList.add("d-none"), 3000);
         }
-
-        // Fungsi untuk format angka dengan titik pemisah ribuan
         function formatNumber(number) {
             return new Intl.NumberFormat('id-ID').format(number);
         }
 
-        // Polling UID terbaru dari server
         setInterval(async () => {
             try {
                 const response = await axios.get(`${apiUrl}/get-latest-uid`);
                 const uid = response.data.uid;
 
-                // Perbarui UID hanya jika berbeda dari yang sebelumnya
+
                 const currentUid = document.getElementById("uid").textContent;
                 if (uid && uid !== currentUid) {
                     document.getElementById("uid").textContent = uid;
-
-                    // Reset data user (nama dan saldo) untuk mendapatkan data baru
                     document.getElementById("nama").textContent = "-";
                     document.getElementById("saldo").textContent = "-";
                     document.getElementById("saldo-sebelumnya").textContent = "-";
@@ -69,7 +63,6 @@
                     document.getElementById("foto").style.display = "none";
                     document.getElementById("foto").src = "";
 
-                    // Dapatkan informasi user berdasarkan UID
                     const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, {
                         uid
                     });
@@ -88,24 +81,22 @@
             } catch (error) {
                 console.error("Error mendapatkan UID: ", error);
             }
-        }, 5000); // Polling setiap 5 detik
+        }, 5000); 
 
-        // Format input tarif secara real-time
         document.getElementById("tarif").addEventListener("input", (e) => {
-            const value = e.target.value.replace(/\./g, ""); // Hilangkan titik sebelumnya
+            const value = e.target.value.replace(/\./g, ""); 
             if (!isNaN(value) && value !== "") {
-                e.target.value = formatNumber(value); // Format ulang dengan titik
+                e.target.value = formatNumber(value); 
             } else {
-                e.target.value = ""; // Kosongkan jika input tidak valid
+                e.target.value = ""; 
             }
         });
 
-        // Form untuk mengurangi saldo
         document.getElementById("kurangi-saldo-form").addEventListener("submit", async (e) => {
             e.preventDefault();
             const uid = document.getElementById("uid").textContent;
             const tarif = document.getElementById("tarif").value.replace(/\./g,
-                ""); // Hilangkan titik sebelum dikirim
+                ""); 
 
             try {
                 const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, {
@@ -114,18 +105,13 @@
                 if (userResponse.data.status === "berhasil") {
                     const user = userResponse.data.user;
                     const saldoSebelumnya = user.saldo;
-
-                    // Update saldo sebelumnya
                     document.getElementById("saldo-sebelumnya").textContent = formatNumber(saldoSebelumnya);
 
-                    // Kurangi saldo
-
                     const response = await axios.post(`${apiUrl}/kurangi-saldo`, {
-                        uid,
+                       uid,
                         tarif
                     });
                     if (response.data.status === "berhasil") {
-                        // Update saldo sesudah with actual value from response
                         document.getElementById("saldo-sesudah").textContent = formatNumber(response.data
                             .saldo_akhir);
                         document.getElementById("saldo").textContent = formatNumber(response.data.saldo_akhir);
