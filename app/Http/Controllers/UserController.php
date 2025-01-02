@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Storage;
 
 class UserController extends Controller
 {
@@ -20,26 +21,35 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'uid' => 'required|unique:users',
-            'nama' => 'required|string|max:255',
-            'saldo' => 'required|numeric',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'uid' => 'required|unique:users',
+                'nama' => 'required',
+                'saldo' => 'required|numeric',
+                'foto' => 'image|mimes:jpeg,png,jpg|max:2048'
+            ]);
 
-        if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/fotos', $fileName); 
-            $validated['foto'] = $fileName; 
-        } else {
-            $validated['foto'] = 'default.jpg';
+            if ($request->hasFile('foto')) {
+                $foto = $request->file('foto');
+                $filename = time() . '.' . $foto->getClientOriginalExtension();
+                $foto->storeAs('public/fotos', $filename);
+                $validatedData['foto'] = $filename;
+            }
+
+            User::create($validatedData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User berhasil ditambahkan'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
         }
-
-        User::create($validated);
-        return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
     }
-
     public function edit($id)
     {
         $user = User::findOrFail($id);
@@ -47,28 +57,47 @@ class UserController extends Controller
     }
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'uid' => 'required|unique:users,uid,' . $id,
-            'nama' => 'required|string|max:255',
-            'saldo' => 'required|numeric',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $user = User::findOrFail($id);
+            
+            $validatedData = $request->validate([
+                'uid' => 'required|unique:users,uid,' . $id,
+                'nama' => 'required',
+                'saldo' => 'required|numeric',
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            ]);
     
-        $user = User::findOrFail($id);
+            if ($request->hasFile('foto')) {
+                if ($user->foto) {
+                    Storage::delete('public/fotos/' . $user->foto);
+                }
+                
+                $foto = $request->file('foto');
+                $filename = time() . '.' . $foto->getClientOriginalExtension();
+                $foto->storeAs('public/fotos', $filename);
+                $validatedData['foto'] = $filename;
+            }
     
-        if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/fotos', $fileName); 
-            $validated['foto'] = $fileName; 
-        } else {
-            $validated['foto'] = $user->foto; 
+            $user->update($validatedData);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'User berhasil diupdate'
+            ], 200);
+    
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
-    
-        $user->update($validated);
-        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
     }
-
     public function destroy($id)
     {
         $user = User::findOrFail($id);
