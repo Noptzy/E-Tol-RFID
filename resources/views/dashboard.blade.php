@@ -1,4 +1,3 @@
-<!-- filepath: /c:/xampp/htdocs/rfidtol/resources/views/dashboard.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,7 +20,8 @@
             <p><strong>Saldo:</strong> <span id="saldo">-</span></p>
             <p><strong>Saldo Sebelumnya:</strong> <span id="saldo-sebelumnya">-</span></p>
             <p><strong>Saldo Sesudah:</strong> <span id="saldo-sesudah">-</span></p>
-            <p><strong>Foto:</strong> <img id="foto" src="" alt="Foto Pengguna" style="max-width: 150px; display: none;"></p>
+            <p><strong>Foto:</strong> <img id="foto" src="" alt="Foto Pengguna"
+                    style="max-width: 150px; display: none;"></p>
         </div>
 
         <form id="kurangi-saldo-form" class="mt-3">
@@ -70,7 +70,9 @@
                     document.getElementById("foto").src = "";
 
                     // Dapatkan informasi user berdasarkan UID
-                    const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, { uid });
+                    const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, {
+                        uid
+                    });
                     if (userResponse.data.status === "berhasil") {
                         const user = userResponse.data.user;
                         document.getElementById("nama").textContent = user.nama;
@@ -102,10 +104,13 @@
         document.getElementById("kurangi-saldo-form").addEventListener("submit", async (e) => {
             e.preventDefault();
             const uid = document.getElementById("uid").textContent;
-            const tarif = document.getElementById("tarif").value.replace(/\./g, ""); // Hilangkan titik sebelum dikirim
+            const tarif = document.getElementById("tarif").value.replace(/\./g,
+                ""); // Hilangkan titik sebelum dikirim
 
             try {
-                const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, { uid });
+                const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, {
+                    uid
+                });
                 if (userResponse.data.status === "berhasil") {
                     const user = userResponse.data.user;
                     const saldoSebelumnya = user.saldo;
@@ -114,20 +119,22 @@
                     document.getElementById("saldo-sebelumnya").textContent = formatNumber(saldoSebelumnya);
 
                     // Kurangi saldo
-                    const response = await axios.post(`${apiUrl}/kurangi-saldo`, { uid, tarif });
+
+                    const response = await axios.post(`${apiUrl}/kurangi-saldo`, {
+                        uid,
+                        tarif
+                    });
                     if (response.data.status === "berhasil") {
-                        const saldoSesudah = saldoSebelumnya - parseInt(tarif);
+                        // Update saldo sesudah with actual value from response
+                        document.getElementById("saldo-sesudah").textContent = formatNumber(response.data
+                            .saldo_akhir);
+                        document.getElementById("saldo").textContent = formatNumber(response.data.saldo_akhir);
 
-                        // Update saldo sesudah
-                        document.getElementById("saldo-sesudah").textContent = formatNumber(saldoSesudah);
-
-                        // Tampilkan pesan "Gerbang Dibuka"
                         showAlert("success", "Saldo berhasil di kurangi, Gerbang Dibuka");
 
-                        // Tunggu 3 detik sebelum gerbang ditutup dan halaman di-refresh
                         setTimeout(() => {
                             location.reload();
-                        }, 30000);
+                        }, 5000);
                     }
                 }
             } catch (error) {

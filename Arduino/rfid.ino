@@ -2,74 +2,143 @@
 #include <MFRC522.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <Servo.h>
+#include <ArduinoJson.h>
 
-#define RST_PIN D2   // Reset pin untuk MFRC522
-#define SS_PIN D4    // Slave select pin untuk MFRC522
+#define RST_PIN D2
+#define SS_PIN D3
+#define SERVO_PIN D4
 
-const char* ssid = "namaWifi"; // Nama Wi-Fi
-const char* password = "passwordWifi";         // Password Wi-Fi
+const char* ssid = "wongirengjambuaten136";
+const char* password = "ngawurcik";
+const char* serverName = "http://192.168.100.26:8000/api/proses-transaksi";
 
-// Laravel API URL
-const char* serverName = "http://ip-mu:port/api/proses-transaksi";
+enum GateState {
+  GATE_CLOSED,
+  GATE_WAITING,
+  GATE_OPEN
+};
 
-// Inisialisasi RFID
 MFRC522 rfid(SS_PIN, RST_PIN);
-
-// Objek WiFiClient untuk koneksi HTTP
 WiFiClient wifiClient;
+Servo myservo;
+GateState currentState = GATE_CLOSED;
 
 void setup() {
-  Serial.begin(115200);       // Serial monitor untuk debugging
-  SPI.begin();                // Inisialisasi SPI bus
-  rfid.PCD_Init();            // Inisialisasi MFRC522
-  
-  // Hubungkan ke Wi-Fi
+  Serial.begin(115200);
+  SPI.begin();
+  rfid.PCD_Init();
+
   WiFi.begin(ssid, password);
-  Serial.println("Menghubungkan ke Wi-Fi...");
+  Serial.println("Mengkoneksikan Ke Wifi....");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("\nTerhubung ke Wi-Fi");
+  Serial.println("\nBerhasil Terkoneksi ke WiFi");
+
+  myservo.attach(SERVO_PIN);
+  myservo.write(0);
+  Serial.println("Gerband Dalam Keadan Tutup");
+}
+
+void checkTransactionStatus(String uid) {
+  HTTPClient http;
+  for(int i = 0; i < 10; i++) {
+    http.begin(wifiClient, serverName);
+    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+    String checkData = "uid=" + uid;
+    int checkCode = http.POST(checkData);
+    
+    if (checkCode > 0) {
+      String checkResponse = http.getString();
+      StaticJsonDocument<200> checkDoc;
+      DeserializationError checkError = deserializeJson(checkDoc, checkResponse);
+      
+      if (!checkError && 
+          strcmp(checkDoc["status"], "success") == 0 && 
+          strcmp(checkDoc["gate_status"], "open") == 0) {
+        currentState = GATE_OPEN;
+        Serial.println("===========================================");
+        Serial.println("Transaksi Sukses, Gerbang Dibuka");
+        Serial.println("Membuka Gerbang...");
+        myservo.write(180);
+        delay(5000);
+        currentState = GATE_CLOSED;
+        Serial.println("5 detik berlalu, menutup gerbang...");
+        myservo.write(0);
+        Serial.println("Gerbang Ditutup, Siap Untuk Transaksi Selanjutnya!!!");
+        Serial.println("===========================================");
+        http.end();
+        return;
+      }
+    }
+    http.end();
+    delay(1000);
+  }
+  Serial.println("Transaksi Gagal, Gerbang Tetap Ditutup");
 }
 
 void loop() {
-  // Periksa apakah kartu RFID berada di dekat reader
-  if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
-    return; // Tidak ada kartu yang terdeteksi
+  if (currentState == GATE_CLOSED) {
+    myservo.write(0);
   }
 
-  // Baca UID dari kartu
+  if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) {
+    return;
+  }
+
   String uid = "";
   for (byte i = 0; i < rfid.uid.size; i++) {
     uid += String(rfid.uid.uidByte[i], HEX);
   }
-  uid.toUpperCase(); // Ubah UID menjadi huruf kapital
-  Serial.println("UID Terbaca: " + uid);
+  uid.toUpperCase();
+  Serial.println("\nCard detected - UID: " + uid);
 
-  // Kirim UID ke server
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    http.begin(wifiClient, serverName); // Gunakan WiFiClient dan URL
+    http.begin(wifiClient, serverName);
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
     
-    // Data yang akan dikirimkan ke API
     String postData = "uid=" + uid;
+    int httpCode = http.POST(postData);
 
-    // Kirim data
-    int httpResponseCode = http.POST(postData);
-
-    // Tampilkan respons dari server
-    if (httpResponseCode > 0) {
+    if (httpCode > 0) {
       String response = http.getString();
-      Serial.println("Response: " + response);
-    } else {
-      Serial.println("Error dalam mengirim data: " + String(httpResponseCode));
-    }
-    http.end(); // Tutup koneksi HTTP
-  } else {
-    Serial.println("Wi-Fi tidak terhubung!");
-  }
+      Serial.println("Server response: " + response);
 
-  delay(3000); // Tunggu beberapa saat sebelum membaca kartu berikutnya
+      StaticJsonDocument<200> doc;
+      DeserializationError error = deserializeJson(doc, response);
+
+      if (!error) {
+        const char* status = doc["status"];
+        const char* gateStatus = doc["gate_status"];
+
+        if (strcmp(status, "success") == 0) {
+          if (strcmp(gateStatus, "open") == 0) {
+            currentState = GATE_OPEN;
+            Serial.println("===========================================");
+            Serial.println("Transaksi Sukses, Membuka Gerbang");
+            myservo.write(180);
+            delay(5000);
+            currentState = GATE_CLOSED;
+            Serial.println("5 Detik Berlalu, Menutup Gerbang...");
+            myservo.write(0);
+            Serial.println("Gerbang Ditutup, Siap Untuk Transaksi Selanjutnya!!!");
+            Serial.println("===========================================");
+          } 
+          else if (strcmp(gateStatus, "waiting") == 0) {
+            currentState = GATE_WAITING;
+            Serial.println("Waiting for balance check...");
+            checkTransactionStatus(uid);
+          }
+        } else {
+          currentState = GATE_CLOSED;
+          Serial.println("Access denied - Gate remains closed");
+        }
+      }
+    }
+    http.end();
+  }
+  delay(2000);
 }
