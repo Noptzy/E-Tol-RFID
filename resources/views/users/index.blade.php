@@ -17,47 +17,38 @@
             <div class="card-body">
                 <div class="mb-3">
                     <a href="{{ route('users.create') }}" class="btn btn-primary">
-                        <i class="bi bi-person-plus-fill me-2 active"></i>Tambah User
+                        <i class="bi bi-person-plus-fill me-2"></i>Tambah User
                     </a>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>UID</th>
-                                <th>Nama</th>
-                                <th>Saldo</th>
-                                <th>Foto</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($users as $user)
-                            <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
-                                <td>{{ $user->uid }}</td>
-                                <td>{{ $user->nama }}</td>
-                                <td>Rp {{ number_format($user->saldo, 0, ',', '.') }}</td>
-                                <td>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    @foreach($users as $user)
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="text-center mb-3">
                                     @if($user->foto)
-                                        <img src="{{ asset('storage/fotos/' . $user->foto) }}" alt="{{ $user->nama }}" width="100">
+                                        <img src="{{ asset('storage/fotos/' . $user->foto) }}" alt="{{ $user->nama }}" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
                                     @else
-                                        <span>Tidak ada foto</span>
+                                        <div class="rounded-circle bg-secondary d-flex justify-content-center align-items-center" style="width: 100px; height: 100px;">
+                                            <span class="text-white">No Foto</span>
+                                        </div>
                                     @endif
-                                </td>
-                                <td>
-                                    <a href="{{ route('users.edit', $user->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                    <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                </div>
+                                <h5 class="card-title text-center">{{ $user->nama }}</h5>
+                                <p class="card-text text-center mb-2"><strong>UID:</strong> {{ $user->uid }}</p>
+                                <p class="card-text text-center"><strong>Saldo:</strong> Rp {{ number_format($user->saldo, 0, ',', '.') }}</p>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between">
+                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>

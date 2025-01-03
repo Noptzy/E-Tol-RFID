@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,10 +16,12 @@
             font-family: 'Arial', sans-serif;
             min-height: 100vh;
         }
+
         .navbar {
             background: linear-gradient(45deg, #1e3c72 0%, #2a5298 100%) !important;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
         }
+
         .card {
             background: rgba(255, 255, 255, 0.1);
             border: none;
@@ -27,20 +30,25 @@
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
         }
+
         .card:hover {
             transform: translateY(-10px);
         }
+
         .card-header {
             padding: 1rem;
             font-weight: bold;
             border-radius: 15px 15px 0 0;
         }
+
         .card-header.bg-primary {
             background: linear-gradient(45deg, #1e3c72 0%, #2a5298 100%) !important;
         }
+
         .card-header.bg-warning {
             background: linear-gradient(45deg, #FF8008 0%, #FFC837 100%) !important;
         }
+
         .profile-image-container {
             display: flex;
             align-items: center;
@@ -48,6 +56,7 @@
             min-height: 100%;
             padding: 20px;
         }
+
         #foto {
             width: 180px;
             height: 180px;
@@ -58,11 +67,13 @@
             display: none;
             margin: auto;
         }
+
         .user-info {
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
+
         .user-info p {
             font-size: 1rem;
             padding: 0.8rem;
@@ -71,14 +82,57 @@
             margin-bottom: 0.8rem;
             border-left: 4px solid #2a5298;
         }
+
         .btn-primary {
             background: linear-gradient(45deg, #1e3c72 0%, #2a5298 100%);
             border: none;
         }
+
         .btn-danger {
             background: linear-gradient(45deg, #cb2d3e 0%, #ef473a 100%);
             border: none;
         }
+
+        .profile-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+}
+
+.profile-image-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 50%;
+}
+
+.user-info p {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.table-header {
+    background-color: #2a5298;
+    color: white;
+    text-align: left;
+}
+
+.table-body {
+    background-color:rgb(227, 227, 227);
+    color:white;
+    text-align: left;
+}
+.table-bordered th, .table-bordered td {
+    border: 1px solid white;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 255, 0.1);
+}
+
     </style>
 </head>
 
@@ -94,6 +148,7 @@
             </div>
         </div>
     </nav>
+
 
     <div class="container py-5">
         <div class="row justify-content-center">
@@ -130,7 +185,8 @@
                                 <label class="form-label">Jumlah Pengurangan (Rp)</label>
                                 <div class="input-group input-group-lg">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" class="form-control" id="tarif" placeholder="Masukkan jumlah">
+                                    <input type="text" class="form-control" id="tarif"
+                                        placeholder="Masukkan jumlah">
                                 </div>
                             </div>
                             <div class="d-grid gap-3">
@@ -147,6 +203,49 @@
             </div>
         </div>
     </div>
+    {{-- table data kelompok --}}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive mt-4">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th>Nama Lengkap</th>
+                                        <th>NIM</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-white-50">Nida Mutmainah</td>
+                                        <td class="text-white-50">23110210</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-white-50">Tegar Dinar Harsya Ibrahim</td>
+                                        <td class="text-white-50">23110189</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-white-50">Muhammad Ilham</td>
+                                        <td class="text-white-50">23110143</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-white-50">Aulya Rahmi Nur Fajriyah</td>
+                                        <td class="text-white-50">23110117</td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <script>
         const apiUrl = "http://192.168.100.26:8000/api";
@@ -180,7 +279,9 @@
                     document.getElementById("foto").style.display = "none";
                     document.getElementById("foto").src = "";
 
-                    const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, { uid });
+                    const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, {
+                        uid
+                    });
                     if (userResponse.data.status === "berhasil") {
                         const user = userResponse.data.user;
                         document.getElementById("nama").textContent = user.nama;
@@ -213,15 +314,21 @@
             const tarif = document.getElementById("tarif").value.replace(/\./g, "");
 
             try {
-                const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, { uid });
+                const userResponse = await axios.post(`${apiUrl}/get-user-by-uid`, {
+                    uid
+                });
                 if (userResponse.data.status === "berhasil") {
                     const user = userResponse.data.user;
                     const saldoSebelumnya = user.saldo;
                     document.getElementById("saldo-sebelumnya").textContent = formatNumber(saldoSebelumnya);
 
-                    const response = await axios.post(`${apiUrl}/kurangi-saldo`, { uid, tarif });
+                    const response = await axios.post(`${apiUrl}/kurangi-saldo`, {
+                        uid,
+                        tarif
+                    });
                     if (response.data.status === "success") {
-                        document.getElementById("saldo-sesudah").textContent = formatNumber(response.data.saldo_akhir);
+                        document.getElementById("saldo-sesudah").textContent = formatNumber(response.data
+                            .saldo_akhir);
                         document.getElementById("saldo").textContent = formatNumber(response.data.saldo_akhir);
 
                         Swal.fire({
@@ -241,4 +348,5 @@
         });
     </script>
 </body>
+
 </html>
